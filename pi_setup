@@ -1,0 +1,6 @@
+# run chrome
+nohup chromium-browser &
+# open raspberry pi
+chromium-browser https://projects.raspberrypi.org/en
+# open scratch 
+chromium-browser https://scratch.mit.edu/projects/editor/
