@@ -1,0 +1,26 @@
+---
+- name: update Pis
+  hosts: all
+
+  tasks:
+  - name: configure wayfire.ini for auto start
+    ansible.builtin.lineinfile:
+      path: /home/catfordcc/.config/wayfire.ini
+      line: '[autostart]'
+      create: yes
+
+  - name: adding chromium startup lines to wayfire.ini
+    ansible.builtin.blockinfile:
+      path: /home/catfordcc/.config/wayfire.ini
+      insertafter: '[autostart]'
+      state: present
+      block: | 
+        chromium = chromium-browser https://www.raspberrypi.org/learn/ --noerrdialogs --disable-infobars --no-first-run -ozone-platform=wayland --enable-features=OverlayScrollbar --disable-restore-session-state --start-fullscreen
+        chromium2 = chromium-browser https://scratch.mit.edu/ --noerrdialogs --disable-infobars --no-first-run --ozone-platform=wayland --enable-features=OverlayScrollbar --disable-restore-session-state
+        screensaver = false
+        dpms = false
+      
+  - name: delete the old wayfire.ini
+    ansible.builtin.file:
+      path: /home/catfordcc/wayfire.ini 
+      state: absent
