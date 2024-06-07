@@ -9,23 +9,46 @@
       line: '[autostart]'
       create: yes
 
-  - name: adding chromium startup lines to wayfire.ini
+  - name: remove 1st chromium startup lines from wayfire.ini
+    ansible.builtin.lineinfile:
+      path: /home/catfordcc/.config/wayfire.ini
+      line: "chromium = chromium-browser https://www.raspberrypi.org/learn/ --noerrdialogs --disable-infobars --no-first-run -ozone-platform=wayland --enable-features=OverlayScrollbar --disable-restore-session-state --start-fullscreen"
+      state: absent
+
+  - name: remove 2nd chromium startup lines from wayfire.ini
+    ansible.builtin.lineinfile:
+      path: /home/catfordcc/.config/wayfire.ini
+      line: "chromium2 = chromium-browser https://scratch.mit.edu/ --noerrdialogs --disable-infobars --no-first-run --ozone-platform=wayland --enable-features=OverlayScrollbar --disable-restore-session-state --start-fullscreen"
+      state: absent
+
+  - name: remove 3rd chromium startup lines from wayfire.ini
+    ansible.builtin.lineinfile:
+      path: /home/catfordcc/.config/wayfire.ini
+      line: "screensaver = false"
+      state: absent
+
+  - name: remove 4th chromium startup lines from wayfire.ini
+    ansible.builtin.lineinfile:
+      path: /home/catfordcc/.config/wayfire.ini
+      line: "dpms = false"
+      state: absent
+
+
+  - name: adding firefox startup lines to wayfire.ini
     ansible.builtin.blockinfile:
       path: /home/catfordcc/.config/wayfire.ini
       insertafter: '[autostart]'
       state: present
       block: | 
-        chromium = chromium-browser https://www.raspberrypi.org/learn/ --noerrdialogs --disable-infobars --no-first-run -ozone-platform=wayland --enable-features=OverlayScrollbar --disable-restore-session-state --start-fullscreen
-        chromium2 = chromium-browser https://scratch.mit.edu/ --noerrdialogs --disable-infobars --no-first-run --ozone-platform=wayland --enable-features=OverlayScrollbar --disable-restore-session-state
-        screensaver = false
-        dpms = false
-      
+        firefox = firefox https://www.raspberrypi.org/learn/ --window-size=1024,720 &
+        firefox2 = firefox https://scratch.mit.edu/ --noerrdialogs --window-size=1024,720 &
+              
   - name: delete the old wayfire.ini
     ansible.builtin.file:
       path: /home/catfordcc/wayfire.ini 
       state: absent
 
-  - name: ensure that chromium is the default browser
+  - name: ensure that firefox is the default browser
     ansible.builtin.shell:
-      cmd: update-alternatives --set x-www-browser /usr/bin/chromium-browser #/usr/bin/firefox
+      cmd: update-alternatives --set x-www-browser /usr/bin/firefox #/usr/bin/chromium-browser
       
