@@ -41,8 +41,8 @@
       state: present
       block: | 
         firefox = firefox https://www.raspberrypi.org/learn/ --window-size=1024,720 &
-        firefox2 = firefox https://scratch.mit.edu/ --noerrdialogs --window-size=1024,720 &
-              
+        firefox2 = firefox --new-window https://scratch.mit.edu/ --window-size=1024,720 &
+
   - name: delete the old wayfire.ini
     ansible.builtin.file:
       path: /home/catfordcc/wayfire.ini 
@@ -51,4 +51,5 @@
   - name: ensure that firefox is the default browser
     ansible.builtin.shell:
       cmd: update-alternatives --set x-www-browser /usr/bin/firefox #/usr/bin/chromium-browser
-      
+
+
