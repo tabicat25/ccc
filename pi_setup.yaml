@@ -24,3 +24,8 @@
     ansible.builtin.file:
       path: /home/catfordcc/wayfire.ini 
       state: absent
+
+  - name: ensure that chromium is the default browser
+    ansible.builtin.shell
+      cmd: update-alternatives --set x-www-browser /usr/bin/chromium-browser #/usr/bin/firefox
+      
