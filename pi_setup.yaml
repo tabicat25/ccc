@@ -1,55 +1,62 @@
 ---
-- name: update Pis
+- name: Ensure CCC Pis are configured the same
   hosts: all
 
   tasks:
-  - name: configure wayfire.ini for auto start
-    ansible.builtin.lineinfile:
-      path: /home/catfordcc/.config/wayfire.ini
-      line: '[autostart]'
-      create: yes
+  #- name: configure wayfire.ini for auto start
+  #  ansible.builtin.lineinfile:
+  #    path: /home/catfordcc/.config/wayfire.ini
+  #    line: '[autostart]'
+  #    create: yes
 
-  - name: remove 1st chromium startup lines from wayfire.ini
-    ansible.builtin.lineinfile:
-      path: /home/catfordcc/.config/wayfire.ini
-      line: "chromium = chromium-browser https://www.raspberrypi.org/learn/ --noerrdialogs --disable-infobars --no-first-run -ozone-platform=wayland --enable-features=OverlayScrollbar --disable-restore-session-state --start-fullscreen"
-      state: absent
-
-  - name: remove 2nd chromium startup lines from wayfire.ini
-    ansible.builtin.lineinfile:
-      path: /home/catfordcc/.config/wayfire.ini
-      line: "chromium2 = chromium-browser https://scratch.mit.edu/ --noerrdialogs --disable-infobars --no-first-run --ozone-platform=wayland --enable-features=OverlayScrollbar --disable-restore-session-state --start-fullscreen"
-      state: absent
-
-  - name: remove 3rd chromium startup lines from wayfire.ini
-    ansible.builtin.lineinfile:
-      path: /home/catfordcc/.config/wayfire.ini
-      line: "screensaver = false"
-      state: absent
-
-  - name: remove 4th chromium startup lines from wayfire.ini
-    ansible.builtin.lineinfile:
-      path: /home/catfordcc/.config/wayfire.ini
-      line: "dpms = false"
-      state: absent
-
-
-  - name: adding firefox startup lines to wayfire.ini
-    ansible.builtin.blockinfile:
-      path: /home/catfordcc/.config/wayfire.ini
-      insertafter: '[autostart]'
-      state: present
-      block: | 
-        firefox = firefox https://www.raspberrypi.org/learn/ --window-size=1024,720 &
-        firefox2 = firefox --new-window https://scratch.mit.edu/ --window-size=1024,720 &
-
-  - name: delete the old wayfire.ini
+  #- name: adding chromium startup lines to wayfire.ini
+  #  ansible.builtin.blockinfile:
+  #    path: /home/catfordcc/.config/wayfire.ini
+  #    insertafter: '[autostart]'
+  #    state: present
+  #    block: | 
+  #      chromium = chromium-browser https://www.raspberrypi.org/learn/ --noerrdialogs --disable-infobars --no-first-run -ozone-platform=wayland --enable-features=OverlayScrollbar --disable-restore-session-state --start-fullscreen
+  #      chromium2 = chromium-browser https://scratch.mit.edu/ --noerrdialogs --disable-infobars --no-first-run --ozone-platform=wayland --enable-features=OverlayScrollbar --disable-restore-session-state
+  #      screensaver = false
+  #      dpms = false
+      
+  - name: delete the wayfire.ini as it creates errors
     ansible.builtin.file:
-      path: /home/catfordcc/wayfire.ini 
+      path: /home/catfordcc/.config/wayfire.ini 
       state: absent
+ 
+  - name: adding catford CC packages
+    ansible.builtin.apt:
+      pkg:
+        - git
+        - python3-configobj
+        - python3-send2trash
+        - python3-dropbox
+
+  - name: Install python packages
+    ansible.builtin.pip:
+      name:
+        - pgzero
+      break_system_packages: true
+
+  - name: clone drupebox
+    ansible.builtin.git:
+      repo: https://github.com/duncanhawthorne/drupebox.git 
+      dest: /home/catfordcc/drupebox
+      clone: yes
+      update: yes
+
+  - name: Remove the old cron tab job that ran as sudo that didn;t work
+    ansible.builtin.cron:
+      name: "drop box sync"
+      state: absent
+
+  - name: Ensure a cron job exists to create the dropbox sync every minute. Creates the entry "0 5,2 * * ls -alh > /dev/null"
+    ansible.builtin.cron:
+      name: "drop box sync"
+      user: catfordcc
+      job: "/usr/bin/python3 /home/catfordcc/drupebox/drupebox.py"
 
   - name: ensure that firefox is the default browser
     ansible.builtin.shell:
       cmd: update-alternatives --set x-www-browser /usr/bin/firefox #/usr/bin/chromium-browser
-
-
