@@ -1,0 +1,21 @@
+#
+# useful commands that I've run
+#
+
+# run the adhoc command "rm -r /home/catfordcc/Dropbox/platformer" against a specific host
+ansible all -a "rm -r /home/catfordcc/Dropbox/platformer" -u catfordcc --ask-pass --limit 192.168.0.206
+
+# run the update playbook
+ansible-playbook piupdate.yaml -u catfordcc --ask-pass --become
+
+# run the config playbook
+ansible-playbook piconfig.yaml -u catfordcc --ask-pass --become
+  
+# shut em all down
+ansible all -a "/sbin/halt" -u catfordcc --ask-pass -become
+
+# ping em all from /etc/ansible/hosts
+ansible all -m ping -u catfordcc --ask-pass -become
+
+# run an update without a playbook
+ansible all -m apt -a "upgrade=yes update_cache=yes cache_valid_time=86400" -u catfordcc --ask-pass --become
