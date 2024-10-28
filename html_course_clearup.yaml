@@ -1,0 +1,21 @@
+---
+- name: html course clear up
+  hosts: all
+  gather_facts: false
+
+  tasks:
+  - name: remove various old files and folders that are no longer needed
+    ansible.builtin.file:
+      path: "{{ item }}"
+      state: absent
+    with_items:
+      - '/home/catfordcc/Dropbox/test file'
+      - '/home/catfordcc/Desktop/ccc-html'
+      - '/etc/passwd-s3fs'
+      - '/mnt/ccc-html'
+
+  - name: remove s3 bucket fstab line
+    ansible.builtin.lineinfile:
+      path: /etc/fstab
+      state: absent
+      regexp: "^s3fs#ccc-html /mnt/ccc-html fuse _netdev,rw,nosuid,nodev,allow_other,nonempty 0 0"
